@@ -1,9 +1,14 @@
 # Tower Game (Stack Up!) 🏗️
 
+[![Live Demo](https://img.shields.io/badge/Demo-Live%20on%20Vercel-success?style=for-the-badge&logo=vercel)](https://tower-games.vercel.app/)
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new)
 
 > **Tower Game (Stack Up!)** is a high-precision 3D tower building game built with HTML5 Canvas and ES6 JavaScript. Created by **Ravi Solanki**.
+
+### 🌐 Live Demo
+Play the game directly in your browser:  
+👉 **[https://tower-games.vercel.app/](https://tower-games.vercel.app/)**
 
 ---
 
