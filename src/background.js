@@ -37,9 +37,9 @@ export const backgroundImg = (engine) => {
 }
 
 const getLinearGradientColorRgb = (colorArr, colorIndex, proportion) => {
-  const currentIndex = colorIndex + 1 >= colorArr.length ? colorArr.length - 1 : colorIndex
+  const currentIndex = Math.min(Math.max(0, colorIndex), colorArr.length - 1)
   const colorCurrent = colorArr[currentIndex]
-  const nextIndex = currentIndex + 1 >= colorArr.length - 1 ? currentIndex : currentIndex + 1
+  const nextIndex = Math.min(currentIndex + 1, colorArr.length - 1)
   const colorNext = colorArr[nextIndex]
   const calRgbValue = (index) => {
     const current = colorCurrent[index]

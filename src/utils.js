@@ -102,12 +102,15 @@ export const getHookStatus = (engine) => {
 
 export const touchEventHandler = (engine) => {
   if (!engine.getVariable(constant.gameStartNow)) return
-  if (engine.debug && engine.paused) {
+  if (engine.paused) {
     return
   }
   if (getHookStatus(engine) !== constant.hookNormal) {
     return
   }
+  try {
+    localStorage.setItem('blue3d_tower_tutorial_seen', 'true')
+  } catch (e) {}
   engine.removeInstance('tutorial')
   engine.removeInstance('tutorial-arrow')
   const b = engine.getInstance(`block_${engine.getVariable(constant.blockCount)}`)
@@ -122,6 +125,7 @@ export const addSuccessCount = (engine) => {
   const lastSuccessCount = engine.getVariable(constant.successCount)
   const success = lastSuccessCount + 1
   engine.setVariable(constant.successCount, success)
+  engine.setVariable('FLOOR_PULSE_TIME', engine.utils.getCurrentTime())
   if (engine.getVariable(constant.hardMode)) {
     engine.setVariable(constant.ropeHeight, engine.height * engine.utils.random(0.35, 0.55))
   }
@@ -130,10 +134,16 @@ export const addSuccessCount = (engine) => {
 
 export const addFailedCount = (engine) => {
   const { setGameFailed } = engine.getVariable(constant.gameUserOption)
-  const lastFailedCount = engine.getVariable(constant.failedCount)
+  const lastFailedCount = engine.getVariable(constant.failedCount, 0)
   const failed = lastFailedCount + 1
   engine.setVariable(constant.failedCount, failed)
   engine.setVariable(constant.perfectCount, 0)
+  engine.setVariable('COMBO_COUNT', 0)
+  engine.setVariable('LIFE_LOST_TIME', engine.utils.getCurrentTime())
+  engine.setVariable('LAST_LOST_HEART_INDEX', failed)
+  if (engine.triggerMiss) {
+    engine.triggerMiss(failed)
+  }
   if (setGameFailed) setGameFailed(failed)
   if (failed >= 3) {
     engine.pauseAudio('bgm')
@@ -143,26 +153,54 @@ export const addFailedCount = (engine) => {
 }
 
 export const addScore = (engine, isPerfect) => {
-  const { setGameScore, successScore, perfectScore } = engine.getVariable(constant.gameUserOption)
+  const {
+    setGameScore, successScore, perfectScore, highScore = 0
+  } = engine.getVariable(constant.gameUserOption)
   const lastPerfectCount = engine.getVariable(constant.perfectCount, 0)
-  const lastGameScore = engine.getVariable(constant.gameScore)
+  const lastGameScore = engine.getVariable(constant.gameScore, 0)
+  const lastComboCount = engine.getVariable('COMBO_COUNT', 0)
+  const combo = lastComboCount + 1
+  engine.setVariable('COMBO_COUNT', combo)
+
   const perfect = isPerfect ? lastPerfectCount + 1 : 0
   const score = lastGameScore + (successScore || 25) + ((perfectScore || 25) * perfect)
   engine.setVariable(constant.gameScore, score)
   engine.setVariable(constant.perfectCount, perfect)
-  if (setGameScore) setGameScore(score)
+  engine.setVariable('SCORE_PULSE_TIME', engine.utils.getCurrentTime())
+
+  const currentHighScore = engine.getVariable('GAME_HIGH_SCORE', highScore)
+  if (currentHighScore > 0 && score > currentHighScore && !engine.getVariable('NEW_BEST_NOTIFIED')) {
+    engine.setVariable('NEW_BEST_NOTIFIED', true)
+    engine.setVariable('NEW_BEST_TIME', engine.utils.getCurrentTime())
+  }
+
+  if (isPerfect) {
+    const text = perfect > 1 ? `PERFECT x${perfect}!` : (combo >= 2 ? `PERFECT! COMBO ×${combo}` : 'PERFECT!')
+    engine.setVariable('PERFECT_FEEDBACK_TIME', engine.utils.getCurrentTime())
+    engine.setVariable('PERFECT_FEEDBACK_TEXT', text)
+  } else if (combo >= 2) {
+    engine.setVariable('PERFECT_FEEDBACK_TIME', engine.utils.getCurrentTime())
+    engine.setVariable('PERFECT_FEEDBACK_TEXT', `COMBO ×${combo}`)
+  }
+
+  if (setGameScore) setGameScore(score, isPerfect, perfect)
 }
 
 export const drawYellowString = (engine, option) => {
   const {
-    string, size, x, y, textAlign, fontName = 'wenxue', fontWeight = 'normal'
+    string, size, x, y, textAlign, fontName = 'wenxue', fontWeight = 'normal',
+    glowColor = null, glowBlur = 0
   } = option
   const { ctx } = engine
   const fontSize = size
   const lineSize = fontSize * 0.1
   ctx.save()
   ctx.beginPath()
-  const gradient = ctx.createLinearGradient(0, 0, 0, y)
+  if (glowColor && glowBlur > 0) {
+    ctx.shadowColor = glowColor
+    ctx.shadowBlur = glowBlur
+  }
+  const gradient = ctx.createLinearGradient(0, y - fontSize, 0, y)
   gradient.addColorStop(0, '#FAD961')
   gradient.addColorStop(1, '#F76B1C')
   ctx.fillStyle = gradient

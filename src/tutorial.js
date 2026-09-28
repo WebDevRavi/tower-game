@@ -1,4 +1,4 @@
-import { getHookStatus } from './utils'
+import { getHookStatus, drawYellowString } from './utils'
 import * as constant from './constant'
 
 export const tutorialAction = (instance, engine, time) => {
@@ -31,5 +31,17 @@ export const tutorialPainter = (instance, engine) => {
   const { name } = instance
   const t = engine.getImg(name)
   ctx.drawImage(t, instance.x, instance.y, instance.width, instance.height)
+  if (name === 'tutorial') {
+    drawYellowString(engine, {
+      string: 'CLICK / TAP TO DROP',
+      size: engine.width * 0.042,
+      x: engine.calWidth,
+      y: instance.y + instance.height + (engine.width * 0.16),
+      textAlign: 'center',
+      fontWeight: 'bold',
+      glowColor: 'rgba(0,0,0,0.5)',
+      glowBlur: 4
+    })
+  }
 }
 

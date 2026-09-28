@@ -1,25 +1,21 @@
 {
-  "name": "tower_game",
+  "name": "tower-game",
   "version": "1.0.0",
-  "description": "",
+  "description": "Stack Up! - Precision tower building game. Created by Ravi Solanki.",
   "main": "index.js",
   "scripts": {
-    "start": "npm run build && node index.js",
-    "build": "webpack --mode production --module-bind js=babel-loader"
+    "start": "node index.js",
+    "dev": "node index.js",
+    "build": "node build.js",
+    "package": "node build.js && node package.js",
+    "zip": "node build.js && node package.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/bmqb/tower_game.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/bmqb/tower_game/issues"
-  },
-  "homepage": "https://github.com/bmqb/tower_game#readme",
+  "author": "Ravi Solanki",
+  "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.42",
     "@babel/preset-env": "^7.0.0-beta.42",
+    "archiver": "^8.0.0",
     "babel-loader": "^8.0.0-beta",
     "express": "^4.16.3",
     "opn": "^5.3.0",

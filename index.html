@@ -1,123 +1,1450 @@
-<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,minimal-ui"><title>Tower Building</title><link rel="icon" type="image/x-icon" href="./assets/favicon.png"><style>*{margin:0;padding:0}img{width:100%}html{background:#fff;height:100%}body{font-family:"Helvetica Neue",Arial,Helvetica,sans-serif;margin:0 auto;text-align:center;width:100%;height:100%;background:#f95240 url(assets/main-bg.png)}@media screen and (min-height:560px){html{font-size:100px}}@media screen and (min-height:640px){html{font-size:112.5px}}@media screen and (min-height:720px){html{font-size:125px}}@media screen and (min-height:800px){html{font-size:137.5px}}@media screen and (min-height:880px){html{font-size:150px}}@media screen and (min-height:960px){html{font-size:162.5px}}@media screen and (min-height:1040px){html{font-size:180px}}@media screen and (min-height:1200px){html{font-size:200px}}html{font-size:17.6vh}#canvas{position:fixed;left:0;top:0;right:0;bottom:0;margin:auto}a{text-decoration:none}li,ol,ul{list-style-type:none;padding:0;margin:0}.hide{display:none}.clear{clear:both}.loading{background-color:#f05a50;height:100%;width:100%}.loading .main{width:60%;margin:0 auto;color:#fff}.loading .main img{width:60%;margin:1rem auto 0}.loading .main .title{font-size:.3rem}.loading .main .text{font-size:.15rem}.loading .main .bar{height:.12rem;width:100%;border:3px solid #fff;border-radius:.6rem;margin:.1rem 0}.loading .main .bar .sub{height:.1rem;width:98%;margin:.008rem auto 0}.loading .main .bar .percent{height:100%;width:0;background-color:#fff;border-radius:.6rem}.loading .logo{position:absolute;bottom:.3rem;left:0;right:0}.loading .logo img{width:1rem}.content{height:100vh;margin:0 auto;position:relative}.landing .title{width:60%}.landing .logo{width:30%;position:absolute;right:.2rem;top:.2rem}.landing .action-2{position:absolute;bottom:.2rem;width:100%}.landing .start{width:65%}.slideTop{-webkit-animation:st 1s ease-in-out;animation:st 1s ease-in-out}@-webkit-keyframes st{0%{transform:translateZ(0)}100%{transform:translate3d(0,-100%,0)}}@keyframes st{0%{transform:translateZ(0)}100%{transform:translate3d(0,-100%,0)}}.slideBottom{-webkit-animation:sb 1s ease-in-out;animation:sb 1s ease-in-out}@-webkit-keyframes sb{0%{transform:translateZ(0)}100%{transform:translate3d(0,200%,0)}}@keyframes sb{0%{transform:translateZ(0)}100%{transform:translate3d(0,200%,0)}}.swing{-webkit-animation:sw 2s ease-in-out alternate infinite;animation:sw 2s ease-in-out alternate infinite}@-webkit-keyframes sw{0%{transform:rotate(5deg);transform-origin:top center}100%{transform:rotate(-5deg);transform-origin:top center}}@keyframes sw{0%{transform:rotate(5deg);transform-origin:top center}100%{transform:rotate(-5deg);transform-origin:top center}}.modal .mask{background-color:#000;opacity:.6;position:fixed;height:100%;width:100%;top:0;left:0}.modal .modal-content{position:fixed;height:100%;width:90%;margin-top:.3rem;top:0}.modal .main{width:85%;margin:0 auto}.modal .container{position:relative}.modal .bg{width:100%;position:absolute;top:0;left:0}.modal .modal-main{width:100%;position:absolute;top:0;left:0;margin-top:-.4rem}.modal .over-img{width:80%;margin:.8rem auto 0}.modal .over-score{margin-top:-.2rem;font-size:.5rem;color:#ff735c;text-shadow:-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff,2px 2px 0 #fff}.modal .tip{font-size:.16rem;color:#9b724e}.modal .over-button-b{width:70%;margin:.1rem auto 0}.wxShare{background:#000;position:absolute;top:0;left:0;width:100%;height:100%;z-index:11;opacity:.9}.wxShare img{width:50%;float:right;margin:10px 10px 0 0}@font-face{font-family:wenxue;src:url(assets/wenxue.eot);src:url(assets/wenxue.eot),url(assets/wenxue.woff),url(assets/wenxue.ttf),url(assets/wenxue.svg)}.font-wenxue{font-family:wenxue}</style></head><body><canvas id="canvas" class="hide"></canvas><div class="content"><div class="loading"><div class="main"><img src="./assets/main-loading.gif"><div class="progress"><div class="title font-wenxue">0%</div><div class="bar"><div class="sub"><div class="percent"></div></div></div><div class="text">Loading...</div></div></div></div><div class="landing hide"><div class="action-1"><img src="./assets/main-index-title.png" class="title swing"></div><div class="action-2"><img id="start" src="./assets/main-index-start.png" class="start"></div></div><div id="modal" class="modal hide"><div class="mask"></div><div class="js-modal-content modal-content"><div class="main"><div class="container"><img src="./assets/main-modal-bg.png" class="bg"><div class="modal-main"><div id="over-modal" class="hide js-modal-card"><img src="./assets/main-modal-over.png" class="over-img"><div id="score" class="over-score font-wenxue"></div><div id="over-zero" class="hide"><div class="tip"><p>Try Again!</p><img src="./assets/main-modal-again-b.png" class="over-button-b js-reload"><img src="./assets/main-modal-invite-b.png" class="over-button-b js-invite"></div></div></div></div></div></div></div></div><div class="wxShare hide"><img src="./assets/main-share-icon.png"></div></div><script src="./dist/main.js"></script><script src="./assets/zepto-1.1.6.min.js"></script><script>var domReady, loadFinish, canvasReady, loadError, gameStart, game, score, successCount
-  // init window height and width
-  var gameWidth = window.innerWidth
-  var gameHeight = window.innerHeight
-  var ratio = 1.5
-  if (gameHeight / gameWidth < ratio) {
-    gameWidth = Math.ceil(gameHeight / ratio)
-  }
-  $('.content').css({ "height": gameHeight + "px", "width": gameWidth + "px" })
-  $('.js-modal-content').css({ "width": gameWidth + "px" })
-
-  // loading animation
-  function hideLoading() {
-    if (domReady && canvasReady) {
-      $('#canvas').show()
-      loadFinish = true
-      setTimeout(function () {
-        $('.loading').hide()
-        $('.landing').show()
-      }, 1000)
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,minimal-ui">
+  <title>Stack Up! - Tower Building Game</title>
+  <meta name="description" content="Stack Up! - Precision tower building game. Stack the blocks as high as you can! Created by Ravi Solanki.">
+  <meta name="author" content="Ravi Solanki">
+  <link rel="icon" type="image/x-icon" href="./assets/favicon.png">
+  <script src="https://sdk.crazygames.com/crazygames-sdk-v3.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    img { width: 100%; display: block; }
+    html { background: #1a1a24; height: 100%; overflow: hidden; }
+    body {
+      font-family: "Helvetica Neue", Arial, Helvetica, sans-serif;
+      margin: 0 auto;
+      text-align: center;
+      width: 100%;
+      height: 100%;
+      background: #f95240 url(assets/main-bg.png);
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
     }
-  }
-
-  function updateLoading(status) {
-    var success = status.success
-    var total = status.total
-    var failed = status.failed
-    if (failed > 0 && !loadError) {
-      loadError = true
-      alert('Network error... Please try again.')
-      return
+    @media screen and (min-height: 560px) { html { font-size: 100px; } }
+    @media screen and (min-height: 640px) { html { font-size: 112.5px; } }
+    @media screen and (min-height: 720px) { html { font-size: 125px; } }
+    @media screen and (min-height: 800px) { html { font-size: 137.5px; } }
+    @media screen and (min-height: 880px) { html { font-size: 150px; } }
+    @media screen and (min-height: 960px) { html { font-size: 162.5px; } }
+    @media screen and (min-height: 1040px) { html { font-size: 180px; } }
+    @media screen and (min-height: 1200px) { html { font-size: 200px; } }
+    html { font-size: 17.6vh; }
+    #canvas {
+      position: fixed;
+      left: 0; top: 0; right: 0; bottom: 0;
+      margin: auto;
+      touch-action: none;
     }
-    var percent = parseInt((success / total) * 100);
-    if (percent === 100 && !canvasReady) {
-      canvasReady = true
-      hideLoading()
+    a { text-decoration: none; }
+    .hide { display: none; }
+    .clear { clear: both; }
+
+    /* Loading Screen */
+    .loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #f05a50 url(assets/main-bg.png);
+      z-index: 500;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0 20px;
+      transition: opacity 0.28s ease;
     }
-    percent = percent > 98 ? 98 : percent
-    percent = percent + '%'
-    $('.loading .title').text(percent);
-    $('.loading .percent').css({
-      'width': percent
-    })
-  }
-
-  function overShowOver() {
-    $('#modal').show()
-    $('#over-modal').show()
-    $('#over-zero').show()
-  }
-
-  // game customization options
-  const option = {
-    width: gameWidth,
-    height: gameHeight,
-    canvasId: 'canvas',
-    soundOn: true,
-    setGameScore: function (s) {
-      score = s
-    },
-    setGameSuccess: function (s) {
-      successCount = s
-    },
-    setGameFailed: function (f) {
-      $('#score').text(score)
-      if (f >= 3) overShowOver()
+    .loading.hide { display: none !important; }
+    .loading .main {
+      width: 80%;
+      max-width: 300px;
+      margin: 0 auto;
+      color: #fff;
+      text-align: center;
     }
-  }
+    .loading .main img {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 16px auto;
+      border-radius: 50%;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+      object-fit: cover;
+      background: rgba(0,0,0,0.1);
+    }
+    .loading .main .title {
+      font-size: 26px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+    }
+    .loading .main .bar {
+      height: 14px;
+      width: 100%;
+      border: 2.5px solid #fff;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.2);
+      overflow: hidden;
+      padding: 1.5px;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+      margin: 10px 0;
+    }
+    .loading .main .bar .sub {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+    }
+    .loading .main .bar .percent {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ffd54f, #ffca28);
+      border-radius: 8px;
+      transition: width 0.15s ease;
+    }
+    .loading .main .text {
+      font-size: 14px;
+      letter-spacing: 0.5px;
+      color: rgba(255, 255, 255, 0.9);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+    }
 
-  // game init with option
-  function gameReady() {
-    game = TowerGame(option)
-    game.load(function () {
-      game.init()
-      setTimeout(function () {
-        game.playBgm()
-      })
-    }, updateLoading)
-  }
+    /* Content & Main Menu */
+    .content { height: 100vh; margin: 0 auto; position: relative; overflow: hidden; }
+    .landing .title { width: 60%; margin: 0 auto; }
+    .landing .logo { width: 30%; position: absolute; right: .2rem; top: .2rem; }
+    .landing .action-2 { position: absolute; bottom: .15rem; width: 100%; text-align: center; }
+    .landing .start { width: 65%; margin: 0 auto; cursor: pointer; transition: transform 0.1s ease; }
+    .landing .start:active { transform: scale(0.96); }
 
-  var isWechat = navigator.userAgent.toLowerCase().indexOf("micromessenger") !== -1
-  if (isWechat) {
-    document.addEventListener("WeixinJSBridgeReady", gameReady, false)
-  } else {
-    gameReady()
-  }
+    /* Main Menu Info & High Score */
+    .main-menu-info {
+      margin-top: .08rem;
+      text-align: center;
+    }
+    .menu-high-score {
+      font-size: .16rem;
+      font-weight: bold;
+      color: #fff;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.6), -1px -1px 0 #b33928, 1px -1px 0 #b33928, -1px 1px 0 #b33928, 1px 1px 0 #b33928;
+      letter-spacing: 0.5px;
+    }
+    .menu-high-score span {
+      color: #ffd54f;
+      font-size: .2rem;
+      margin-left: 2px;
+    }
+    .menu-credit {
+      font-size: .12rem;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: .04rem;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+      font-weight: 500;
+    }
 
-  function indexHide() {
-    $('.landing .action-1').addClass('slideTop')
-    $('.landing .action-2').addClass('slideBottom')
+    /* Animations */
+    .slideTop { -webkit-animation: st 1s ease-in-out; animation: st 1s ease-in-out; }
+    @-webkit-keyframes st { 0% { transform: translateZ(0); } 100% { transform: translate3d(0, -100%, 0); } }
+    @keyframes st { 0% { transform: translateZ(0); } 100% { transform: translate3d(0, -100%, 0); } }
+    .slideBottom { -webkit-animation: sb 1s ease-in-out; animation: sb 1s ease-in-out; }
+    @-webkit-keyframes sb { 0% { transform: translateZ(0); } 100% { transform: translate3d(0, 200%, 0); } }
+    @keyframes sb { 0% { transform: translateZ(0); } 100% { transform: translate3d(0, 200%, 0); } }
+    .swing {
+      -webkit-animation: sw 2s ease-in-out alternate infinite;
+      animation: sw 2s ease-in-out alternate infinite;
+    }
+    @-webkit-keyframes sw {
+      0% { transform: rotate(5deg); transform-origin: top center; }
+      100% { transform: rotate(-5deg); transform-origin: top center; }
+    }
+    @keyframes sw {
+      0% { transform: rotate(5deg); transform-origin: top center; }
+      100% { transform: rotate(-5deg); transform-origin: top center; }
+    }
+
+    /* Modals - Sized and Centered Responsively */
+    .modal {
+      z-index: 200;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .modal.hide { display: none !important; }
+    .modal .mask {
+      background-color: rgba(0, 0, 0, 0.65);
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      top: 0;
+      left: 0;
+      animation: maskFade 0.22s ease-out;
+    }
+    @keyframes maskFade {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    .modal .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 82%;
+      max-width: 330px;
+      margin: 0;
+      text-align: center;
+      animation: modalPop 0.24s cubic-bezier(0.175, 0.885, 0.32, 1.25);
+    }
+    @keyframes modalPop {
+      0% { transform: translate(-50%, -50%) scale(0.88); opacity: 0; }
+      100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    }
+    .modal .main {
+      width: 100%;
+      margin: 0 auto;
+    }
+    .modal .container {
+      position: relative;
+      width: 100%;
+    }
+    .modal .bg {
+      width: 100%;
+      display: block;
+    }
+    .modal .modal-main {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px 20px 16px;
+    }
+
+    /* Game Over Modal Styling */
+    .modal .over-img {
+      width: 78%;
+      margin: 0 auto;
+      display: block;
+    }
+    .modal .over-score {
+      margin-top: 6px;
+      font-size: 42px;
+      line-height: 1;
+      color: #ff735c;
+      text-shadow: -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff, 0 2px 4px rgba(0,0,0,0.25);
+    }
+    .over-best {
+      font-size: 16px;
+      color: #9b724e;
+      margin-top: 5px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .over-best span {
+      color: #e65100;
+      font-size: 18px;
+    }
+    .over-new-record {
+      font-size: 15px;
+      color: #ffb300;
+      font-weight: bold;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      margin-top: 4px;
+      animation: pulse 1s infinite alternate;
+    }
+    @keyframes pulse { 0% { transform: scale(0.95); } 100% { transform: scale(1.08); } }
+    .modal .tip {
+      font-size: 14px;
+      color: #9b724e;
+      margin-top: 6px;
+      font-weight: bold;
+    }
+    .modal .over-button-b {
+      width: 72%;
+      max-width: 190px;
+      margin: 10px auto 0 auto;
+      display: block;
+      cursor: pointer;
+      transition: transform 0.1s;
+    }
+    .modal .over-button-b:active { transform: scale(0.95); }
+
+    /* Home Button on Game Over Modal */
+    .over-button-home {
+      display: block;
+      width: 72%;
+      max-width: 190px;
+      margin: 10px auto 0 auto;
+      padding: 9px 0;
+      background: linear-gradient(180deg, #ff9800 0%, #f57c00 50%, #e65100 100%);
+      color: #ffffff;
+      border: 2px solid #ffffff;
+      border-radius: 25px;
+      font-size: 15px;
+      font-weight: bold;
+      letter-spacing: 1px;
+      cursor: pointer;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3), inset 0 1px 1px rgba(255,255,255,0.6);
+      transition: transform 0.1s ease, filter 0.1s ease;
+      outline: none;
+    }
+    .over-button-home:hover {
+      transform: scale(1.03);
+      filter: brightness(1.05);
+    }
+    .over-button-home:active { transform: scale(0.95); }
+
+    /* Gameplay Screen Controls (HUD) */
+    .game-hud {
+      position: absolute;
+      bottom: 20px;
+      right: 14px;
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      z-index: 100;
+      pointer-events: auto;
+    }
+    .game-hud.hide { display: none !important; }
+    .hud-btn {
+      width: 48px;
+      height: 48px;
+      position: relative;
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.4));
+      transition: transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.12s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .hud-btn:hover {
+      transform: scale(1.08);
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45)) brightness(1.05);
+    }
+    .hud-btn:active {
+      transform: scale(0.92);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35)) brightness(0.92);
+    }
+    .hud-icon-img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      pointer-events: none;
+      transition: filter 0.2s ease, opacity 0.2s ease;
+    }
+    .hud-btn.muted .hud-icon-img {
+      filter: none;
+      opacity: 0.95;
+    }
+
+    @media screen and (max-height: 480px) {
+      .game-hud {
+        bottom: 8px;
+        right: 8px;
+        gap: 6px;
+      }
+      .hud-btn {
+        width: 38px;
+        height: 38px;
+      }
+    }
+
+    /* Pause Modal Styles - Optimized Size */
+    .pause-logo {
+      width: 82%;
+      max-width: 225px;
+      margin: 0 auto 8px auto;
+      display: block;
+      filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+    }
+    .pause-title {
+      font-size: 26px;
+      color: #ff9800;
+      margin-bottom: 12px;
+      text-shadow: -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff, 2px 2px 0 #fff, 0 3px 6px rgba(0,0,0,0.3);
+      letter-spacing: 2px;
+    }
+    .pause-actions {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .pause-btn {
+      width: 76%;
+      max-width: 200px;
+      padding: 9px 0;
+      font-size: 15px;
+      font-weight: bold;
+      color: #fff;
+      border-radius: 25px;
+      border: 2px solid #fff;
+      cursor: pointer;
+      outline: none;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.25), inset 0 1px 1px rgba(255,255,255,0.6);
+      transition: transform 0.1s ease, filter 0.1s ease;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+    .pause-btn:hover {
+      transform: scale(1.03);
+      filter: brightness(1.05);
+    }
+    .pause-btn:active { transform: scale(0.95); }
+    .btn-blue {
+      background: linear-gradient(180deg, #29b6f6 0%, #0288d1 50%, #01579b 100%);
+    }
+    .btn-orange {
+      background: linear-gradient(180deg, #ff9800 0%, #f57c00 50%, #e65100 100%);
+    }
+
+    @media screen and (max-height: 600px) {
+      .modal .modal-content {
+        max-width: 270px;
+      }
+      .pause-logo {
+        width: 70%;
+        max-width: 170px;
+        margin-bottom: 6px;
+      }
+      .pause-title {
+        font-size: 20px;
+        margin-bottom: 8px;
+      }
+      .pause-actions {
+        gap: 6px;
+      }
+      .pause-btn {
+        padding: 7px 0;
+        font-size: 13px;
+      }
+    }
+    @media screen and (max-height: 480px) {
+      .modal .modal-content {
+        max-width: 220px;
+      }
+      .pause-logo {
+        width: 60%;
+        max-width: 135px;
+        margin-bottom: 4px;
+      }
+      .pause-title {
+        font-size: 16px;
+        margin-bottom: 5px;
+      }
+      .pause-actions {
+        gap: 4px;
+      }
+      .pause-btn {
+        padding: 5px 0;
+        font-size: 11px;
+      }
+    }
+
+    /* Toast notification */
+    .game-toast {
+      position: fixed;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.85);
+      color: #ffffff;
+      padding: 10px 22px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: bold;
+      z-index: 500;
+      pointer-events: none;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .game-toast.show { opacity: 1; }
+
+    /* Soft Tactile Screen Shake Impacts */
+    .shake-land {
+      animation: anim-shake-land 0.18s cubic-bezier(0.25, 1, 0.5, 1) both !important;
+    }
+    @keyframes anim-shake-land {
+      0% { transform: translate3d(0, 0, 0); }
+      30% { transform: translate3d(0, 4px, 0); }
+      60% { transform: translate3d(0, -2px, 0); }
+      85% { transform: translate3d(0, 1px, 0); }
+      100% { transform: translate3d(0, 0, 0); }
+    }
+
+    .shake-perfect {
+      animation: anim-shake-perfect 0.24s cubic-bezier(0.25, 1, 0.5, 1) both !important;
+    }
+    @keyframes anim-shake-perfect {
+      0% { transform: translate3d(0, 0, 0) scale(1); }
+      30% { transform: translate3d(0, 6px, 0) scale(1.015); }
+      60% { transform: translate3d(0, -3px, 0) scale(0.995); }
+      85% { transform: translate3d(0, 1px, 0) scale(1.005); }
+      100% { transform: translate3d(0, 0, 0) scale(1); }
+    }
+
+    .shake-miss {
+      animation: anim-shake-miss 0.32s cubic-bezier(0.25, 1, 0.5, 1) both !important;
+    }
+    @keyframes anim-shake-miss {
+      0% { transform: translate3d(0, 0, 0); }
+      15% { transform: translate3d(-6px, 4px, 0); }
+      30% { transform: translate3d(5px, -3px, 0); }
+      45% { transform: translate3d(-4px, 2px, 0); }
+      60% { transform: translate3d(3px, -2px, 0); }
+      75% { transform: translate3d(-2px, 1px, 0); }
+      90% { transform: translate3d(1px, 0, 0); }
+      100% { transform: translate3d(0, 0, 0); }
+    }
+
+    /* Soft Tone Red Damage Flash Overlay on Miss (Low Opacity) */
+    .damage-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 999;
+      background: radial-gradient(ellipse at center, rgba(255, 80, 80, 0.08) 0%, rgba(230, 50, 50, 0.3) 100%);
+      box-shadow: inset 0 0 60px 15px rgba(230, 50, 50, 0.25);
+      opacity: 0;
+      transition: opacity 0.45s ease-out;
+    }
+    .damage-overlay.active {
+      opacity: 0.35 !important;
+      transition: opacity 0.04s ease-out !important;
+    }
+
+    /* Golden Shine Flash on Perfect Placement */
+    .perfect-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 998;
+      background: radial-gradient(circle at 50% 40%, rgba(255, 250, 180, 0.5) 0%, rgba(255, 215, 0, 0.25) 45%, transparent 75%);
+      box-shadow: inset 0 0 50px 10px rgba(255, 215, 0, 0.3);
+      opacity: 0;
+      transition: opacity 0.35s ease-out;
+    }
+    .perfect-overlay.active {
+      opacity: 0.7 !important;
+      transition: opacity 0.04s ease-out !important;
+    }
+
+    @font-face {
+      font-family: wenxue;
+      src: url(assets/wenxue.woff), url(wenxue.woff), url(assets/wenxue.ttf), url(wenxue.ttf), url(assets/wenxue.svg), url(wenxue.svg);
+    }
+    .font-wenxue { font-family: wenxue, sans-serif; }
+  </style>
+  <script>
+    // Resilient asset loading: if any <img> fails from ./assets/, automatically try root ./
+    window.addEventListener('error', function (e) {
+      if (e && e.target && e.target.tagName === 'IMG') {
+        var src = e.target.getAttribute('src');
+        if (src && src.indexOf('./assets/') === 0 && !e.target.dataset.retried) {
+          e.target.dataset.retried = '1';
+          e.target.src = src.replace('./assets/', './');
+        }
+      }
+    }, true);
+  </script>
+</head>
+<body>
+  <canvas id="canvas" class="hide"></canvas>
+  <div id="damage-overlay" class="damage-overlay"></div>
+  <div id="perfect-overlay" class="perfect-overlay"></div>
+
+  <div class="content">
+    <!-- Loading Screen -->
+    <div class="loading">
+      <div class="main">
+        <img src="./assets/main-loading.gif" alt="">
+        <div class="progress">
+          <div class="title font-wenxue">0%</div>
+          <div class="bar"><div class="sub"><div class="percent"></div></div></div>
+          <div class="text">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Menu / Home Screen -->
+    <div class="landing hide">
+      <div class="action-1">
+        <img src="./assets/main-index-title.png" class="title swing" alt="Stack Up Title">
+      </div>
+      <div class="action-2">
+        <img id="start" src="./assets/main-index-start.png" class="start" alt="Start Game">
+        <div class="main-menu-info">
+          <div class="menu-high-score">HIGH SCORE: <span id="high-score-val" class="font-wenxue">0</span></div>
+          <div class="menu-credit">Created by Ravi Solanki</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Gameplay HUD Controls -->
+    <div id="game-hud" class="game-hud hide">
+      <button id="btn-pause" class="hud-btn" title="Pause (P / Esc)" aria-label="Pause">
+        <img src="./assets/icon-pause.png" alt="Pause" class="hud-icon-img">
+      </button>
+      <button id="btn-sound" class="hud-btn" title="Sound Toggle (M)" aria-label="Sound Toggle">
+        <img id="hud-sound-img" src="./assets/icon-audio.png" alt="Sound" class="hud-icon-img">
+      </button>
+      <button id="btn-home" class="hud-btn" title="Exit to Main Menu" aria-label="Exit to Menu">
+        <img src="./assets/icon-home.png" alt="Home" class="hud-icon-img">
+      </button>
+    </div>
+
+    <!-- Pause Modal -->
+    <div id="pause-modal" class="modal hide">
+      <div class="mask"></div>
+      <div class="modal-content">
+        <div class="main">
+          <div class="container">
+            <img src="./assets/main-modal-bg.png" class="bg" alt="Modal Background">
+            <div class="modal-main">
+              <img src="./assets/main-pause-logo.png" class="pause-logo" alt="Tower Game">
+              <div class="pause-title font-wenxue">PAUSED</div>
+              <div class="pause-actions">
+                <button id="btn-resume" class="pause-btn btn-blue">RESUME</button>
+                <button id="btn-pause-sound" class="pause-btn btn-orange">SOUND: ON</button>
+                <button id="btn-pause-restart" class="pause-btn btn-blue">RESTART</button>
+                <button id="btn-pause-home" class="pause-btn btn-orange">MAIN MENU</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="modal" class="modal hide">
+      <div class="mask"></div>
+      <div class="js-modal-content modal-content">
+        <div class="main">
+          <div class="container">
+            <img src="./assets/main-modal-bg.png" class="bg" alt="Modal Background">
+            <div class="modal-main">
+              <div id="over-modal" class="hide js-modal-card">
+                <img src="./assets/main-modal-over.png" class="over-img" alt="Game Over">
+                <div id="score" class="over-score font-wenxue">0</div>
+                <div class="over-best font-wenxue">BEST: <span id="over-best-val">0</span></div>
+                <div id="over-new-record" class="over-new-record font-wenxue hide">★ NEW BEST! ★</div>
+                <div id="over-zero" class="hide">
+                  <div class="tip">
+                    <p>Try Again!</p>
+                    <img src="./assets/main-modal-again-b.png" class="over-button-b js-reload" alt="Replay">
+                    <button id="btn-over-home" class="over-button-home">MAIN MENU</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="game-toast" class="game-toast"></div>
+  </div>
+
+  <script src="./dist/main.js"></script>
+  <script src="./assets/zepto-1.1.6.min.js"></script>
+  <script>
+    // Resilient fallback for Zepto / $ if blocked or deferred in sandboxed iframes
+    if (typeof window.$ === 'undefined') {
+      window.$ = function (selector) {
+        var elements = typeof selector === 'string' ? document.querySelectorAll(selector) : (selector ? [selector] : []);
+        return {
+          length: elements.length,
+          0: elements[0],
+          each: function (fn) { Array.prototype.forEach.call(elements, fn); return this; },
+          addClass: function (cls) { Array.prototype.forEach.call(elements, function (el) { if (el && el.classList) el.classList.add(cls); }); return this; },
+          removeClass: function (cls) { Array.prototype.forEach.call(elements, function (el) { if (el && el.classList) el.classList.remove(cls); }); return this; },
+          text: function (txt) { if (txt === undefined) return elements[0] ? elements[0].innerText : ''; Array.prototype.forEach.call(elements, function (el) { if (el) el.innerText = txt; }); return this; },
+          show: function () { Array.prototype.forEach.call(elements, function (el) { if (el) el.style.display = 'block'; }); return this; },
+          hide: function () { Array.prototype.forEach.call(elements, function (el) { if (el) el.style.display = 'none'; }); return this; },
+          attr: function (name, val) { if (val === undefined) return elements[0] ? elements[0].getAttribute(name) : ''; Array.prototype.forEach.call(elements, function (el) { if (el) el.setAttribute(name, val); }); return this; },
+          on: function (events, fn) {
+            events.split(' ').forEach(function (ev) {
+              Array.prototype.forEach.call(elements, function (el) {
+                if (el && el.addEventListener) el.addEventListener(ev, fn, false);
+              });
+            });
+            return this;
+          }
+        };
+      };
+    }
+
+    var domReady = false;
+    var loadFinish = false;
+    var canvasReady = false;
+    var loadError = false;
+    var gameStart = false;
+    var game = null;
+    var score = 0;
+    var successCount = 0;
+    var highScore = 0;
+    var soundEnabled = true;
+    var isPlatformMuted = false;
+    var crazySDK = null;
+
+    // Safety watchdog: Guarantee loading screen is dismissed within 2.2s under any circumstance
     setTimeout(function () {
-      $('.landing').hide()
-    }, 950)
-  }
+      if (!loadFinish) {
+        console.warn('[Safety Watchdog] Forcing game reveal to prevent hang');
+        hideLoading();
+      }
+    }, 2200);
 
-  // click event
-  $('#start').on('click', function () {
-    if (gameStart) return
-    gameStart = true
-    setTimeout(function () {
-      game.playBgm()
-    })
-    indexHide()
-    setTimeout(game.start, 400)
-  })
+    // Responsive Canvas & Viewport Setup
+    var gameWidth = window.innerWidth;
+    var gameHeight = window.innerHeight;
+    var ratio = 1.5;
+    if (gameHeight / gameWidth < ratio) {
+      gameWidth = Math.ceil(gameHeight / ratio);
+    }
+    var contentEl = document.querySelector('.content');
+    if (contentEl) {
+      contentEl.style.height = gameHeight + 'px';
+      contentEl.style.width = gameWidth + 'px';
+    }
 
-  $('.js-reload').on('click', function () {
-    window.location.href = window.location.href + '?s=' + (+new Date())
-  })
+    function resizeViewport() {
+      gameWidth = window.innerWidth;
+      gameHeight = window.innerHeight;
+      if (gameHeight / gameWidth < ratio) {
+        gameWidth = Math.ceil(gameHeight / ratio);
+      }
+      var cEl = document.querySelector('.content');
+      if (cEl) {
+        cEl.style.height = gameHeight + 'px';
+        cEl.style.width = gameWidth + 'px';
+      }
+      if (game && game.canvas && game.highResolution) {
+        game.canvas.style.width = gameWidth + 'px';
+        game.canvas.style.height = gameHeight + 'px';
+      }
+    }
+    window.addEventListener('resize', resizeViewport);
+    window.addEventListener('orientationchange', resizeViewport);
 
-  $('.js-invite').on('click', function () {
-    $('.wxShare').show()
-  })
+    // Toast Message
+    var toastTimeout = null;
+    function showToast(msg) {
+      try {
+        var $toast = $('#game-toast');
+        $toast.text(msg).addClass('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(function () {
+          $toast.removeClass('show');
+        }, 2400);
+      } catch (e) {}
+    }
 
-  $('.wxShare').on('click', function () {
-    $('.wxShare').hide()
-  })
+    // High Score Persistence (localStorage + CrazyGames Data)
+    function loadSavedData() {
+      try {
+        var savedScore = localStorage.getItem('blue3d_tower_high_score');
+        if (savedScore !== null) {
+          highScore = parseInt(savedScore, 10) || 0;
+        }
+        var savedSound = localStorage.getItem('blue3d_tower_sound_on');
+        if (savedSound !== null) {
+          soundEnabled = savedSound === 'true';
+        } else {
+          soundEnabled = true;
+        }
+      } catch (e) {
+        soundEnabled = true;
+      }
 
-  // listener
-  window.addEventListener('load', function () {
-    domReady = true
-    hideLoading()
-  }, false);</script><script async src="https://www.googletagmanager.com/gtag/js?id=G-YCWZ8ZDCH2"></script><script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-YCWZ8ZDCH2")</script></body></html>
+      try {
+        var el1 = document.getElementById('high-score-val');
+        if (el1) el1.innerText = highScore;
+        var el2 = document.getElementById('over-best-val');
+        if (el2) el2.innerText = highScore;
+        updateSoundUI();
+        initTapSound();
+        applyAudioState();
+      } catch (e) {
+        console.warn('loadSavedData DOM error:', e);
+      }
+    }
+
+    function saveHighScore(newScore) {
+      if (newScore > highScore) {
+        highScore = newScore;
+        $('#high-score-val').text(highScore);
+        if (game) {
+          game.setVariable('GAME_HIGH_SCORE', highScore);
+        }
+        $('#over-best-val').text(highScore);
+        try {
+          localStorage.setItem('blue3d_tower_high_score', highScore.toString());
+          if (crazySDK && crazySDK.data) {
+            crazySDK.data.setItem('highScore', highScore.toString());
+          }
+        } catch (e) {}
+      }
+    }
+
+    function saveSoundPreference(enabled) {
+      soundEnabled = enabled;
+      try {
+        localStorage.setItem('blue3d_tower_sound_on', enabled.toString());
+      } catch (e) {}
+      applyAudioState();
+      updateSoundUI();
+    }
+
+    // Kenney CC0 UI Tap Sound Player (Zero-Latency Web Audio API with HTML5 Fallback)
+    var tapBuffer = null;
+    var audioCtx = null;
+    var fallbackTapAudio = new Audio('./assets/tap.wav');
+    fallbackTapAudio.volume = 0.55;
+
+    function initTapSound() {
+      try {
+        var AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass && !audioCtx) {
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx && !tapBuffer) {
+          fetch('./assets/tap.wav')
+            .then(function (res) { return res.arrayBuffer(); })
+            .then(function (buf) { return audioCtx.decodeAudioData(buf); })
+            .then(function (decoded) { tapBuffer = decoded; })
+            .catch(function () {});
+        }
+      } catch (e) {}
+    }
+
+    function playTapSound() {
+      var effectiveSound = soundEnabled && !isPlatformMuted;
+      if (!effectiveSound) return;
+      try {
+        if (audioCtx && tapBuffer) {
+          if (audioCtx.state === 'suspended') {
+            audioCtx.resume().catch(function () {});
+          }
+          var source = audioCtx.createBufferSource();
+          var gainNode = audioCtx.createGain();
+          source.buffer = tapBuffer;
+          gainNode.gain.value = 0.55;
+          source.connect(gainNode);
+          gainNode.connect(audioCtx.destination);
+          source.start(0);
+          return;
+        }
+        fallbackTapAudio.currentTime = 0;
+        var p = fallbackTapAudio.play();
+        if (p && typeof p.catch === 'function') {
+          p.catch(function () {});
+        }
+      } catch (e) {}
+    }
+
+    function updateSoundUI() {
+      var effectiveSound = soundEnabled && !isPlatformMuted;
+      if (effectiveSound) {
+        $('#btn-sound').removeClass('muted');
+        $('#hud-sound-img').attr('src', './assets/icon-audio.png');
+        $('#btn-pause-sound').text('SOUND: ON');
+      } else {
+        $('#btn-sound').addClass('muted');
+        $('#hud-sound-img').attr('src', './assets/icon-audio-muted.png');
+        $('#btn-pause-sound').text('SOUND: OFF');
+      }
+    }
+
+    function applyAudioState() {
+      if (game) {
+        var effectiveSound = soundEnabled && !isPlatformMuted;
+        game.setSound(effectiveSound);
+      }
+    }
+
+    // CrazyGames SDK v3 Initialization with continuous polling
+    var sdkInitAttempts = 0;
+    var sdkInitialized = false;
+
+    async function initCrazySDK() {
+      if (sdkInitialized) return;
+      if (window.CrazyGames && window.CrazyGames.SDK) {
+        sdkInitialized = true;
+        try {
+          await window.CrazyGames.SDK.init();
+          crazySDK = window.CrazyGames.SDK;
+          console.log('[CrazyGames] SDK v3 initialized successfully');
+          if (crazySDK.game && crazySDK.game.loadingStart) {
+            crazySDK.game.loadingStart();
+          }
+          if (crazySDK.game && crazySDK.game.settings) {
+            if (typeof crazySDK.game.settings.muteAudio !== 'undefined') {
+              isPlatformMuted = !!crazySDK.game.settings.muteAudio;
+              applyAudioState();
+              updateSoundUI();
+            }
+          }
+          if (crazySDK.game && crazySDK.game.addSettingsChangeListener) {
+            crazySDK.game.addSettingsChangeListener(function (newSettings) {
+              if (newSettings && typeof newSettings.muteAudio !== 'undefined') {
+                isPlatformMuted = !!newSettings.muteAudio;
+                applyAudioState();
+                updateSoundUI();
+              }
+            });
+          }
+          if (crazySDK.data && crazySDK.data.getItem) {
+            var cloudScore = await crazySDK.data.getItem('highScore');
+            if (cloudScore !== null && cloudScore !== undefined) {
+              var parsed = parseInt(cloudScore, 10);
+              if (!isNaN(parsed) && parsed > highScore) {
+                highScore = parsed;
+                var el1 = document.getElementById('high-score-val');
+                if (el1) el1.innerText = highScore;
+                var el2 = document.getElementById('over-best-val');
+                if (el2) el2.innerText = highScore;
+              }
+            }
+          }
+        } catch (err) {
+          console.warn('[CrazyGames] SDK init warning:', err);
+        }
+      } else {
+        sdkInitAttempts++;
+        if (sdkInitAttempts < 100) { // Retry for up to 5s (100 * 50ms)
+          setTimeout(initCrazySDK, 50);
+        }
+      }
+    }
+
+    // Loading Animation & Screen Transitions
+    function hideLoading() {
+      if (loadFinish) return;
+      loadFinish = true;
+      try {
+        var canvas = document.getElementById('canvas');
+        if (canvas) {
+          canvas.classList.remove('hide');
+          canvas.style.display = 'block';
+        }
+        var loadingEl = document.querySelector('.loading');
+        if (loadingEl) {
+          loadingEl.style.opacity = '0';
+          setTimeout(function () {
+            loadingEl.classList.add('hide');
+            loadingEl.style.display = 'none';
+            var landingEl = document.querySelector('.landing');
+            if (landingEl) {
+              landingEl.classList.remove('hide');
+              landingEl.style.display = 'block';
+            }
+            if (crazySDK && crazySDK.game && crazySDK.game.loadingStop) {
+              try { crazySDK.game.loadingStop(); } catch (e) {}
+            }
+          }, 180);
+        } else {
+          var landingEl = document.querySelector('.landing');
+          if (landingEl) {
+            landingEl.classList.remove('hide');
+            landingEl.style.display = 'block';
+          }
+          if (crazySDK && crazySDK.game && crazySDK.game.loadingStop) {
+            try { crazySDK.game.loadingStop(); } catch (e) {}
+          }
+        }
+      } catch (e) {
+        console.error('hideLoading error:', e);
+      }
+    }
+
+    function updateLoading(status) {
+      var success = (status && status.success) || 0;
+      var total = (status && status.total) || 1;
+      var failed = (status && status.failed) || 0;
+      if (failed > 0 && !loadError) {
+        loadError = true;
+      }
+      var percent = Math.min(100, Math.floor((success / total) * 100));
+      if (percent >= 95 || (total > 0 && success + failed >= total)) {
+        canvasReady = true;
+        hideLoading();
+      }
+      var pctText = Math.min(100, percent) + '%';
+      var titleEl = document.querySelector('.loading .title');
+      if (titleEl) titleEl.innerText = pctText;
+      var barEl = document.querySelector('.loading .percent');
+      if (barEl) barEl.style.width = pctText;
+    }
+
+    function overShowOver() {
+      if (crazySDK && crazySDK.game && crazySDK.game.gameplayStop) {
+        crazySDK.game.gameplayStop();
+      }
+      $('#game-hud').addClass('hide');
+      $('#score').text(score);
+
+      var isNewRecord = score > highScore && score > 0;
+      saveHighScore(score);
+
+      if (isNewRecord) {
+        $('#over-new-record').removeClass('hide');
+        if (crazySDK && crazySDK.game && crazySDK.game.happytime) {
+          crazySDK.game.happytime();
+        }
+      } else {
+        $('#over-new-record').addClass('hide');
+      }
+
+      $('#modal').removeClass('hide').show();
+      $('#over-modal').removeClass('hide').show();
+      $('#over-zero').removeClass('hide').show();
+    }
+
+    var shakeTimer = null;
+    var damageTimer = null;
+    var perfectTimer = null;
+
+    function applyScreenShake(type) {
+      // Targets: game canvas and HUD container for a clean, soft, localized tactile feel
+      var targets = [document.getElementById('canvas'), document.querySelector('.content')];
+      var cls = type === 'miss' ? 'shake-miss' : (type === 'perfect' ? 'shake-perfect' : 'shake-land');
+      var duration = type === 'miss' ? 320 : (type === 'perfect' ? 240 : 180);
+
+      targets.forEach(function (el) {
+        if (!el) return;
+        el.classList.remove('shake-land', 'shake-perfect', 'shake-miss');
+        void el.offsetWidth; // Force synchronous reflow on each element to guarantee replay
+        el.classList.add(cls);
+      });
+
+      if (shakeTimer) clearTimeout(shakeTimer);
+      shakeTimer = setTimeout(function () {
+        targets.forEach(function (el) {
+          if (el) el.classList.remove('shake-land', 'shake-perfect', 'shake-miss');
+        });
+      }, duration);
+    }
+
+    var damageHoldTimer = null;
+    var perfectHoldTimer = null;
+
+    function triggerImpactShake(isPerfect) {
+      applyScreenShake(isPerfect ? 'perfect' : 'land');
+
+      if (isPerfect) {
+        var gold = document.getElementById('perfect-overlay');
+        if (gold) {
+          if (perfectHoldTimer) clearTimeout(perfectHoldTimer);
+          gold.classList.add('active');
+          perfectHoldTimer = setTimeout(function () {
+            gold.classList.remove('active');
+          }, 120);
+        }
+      }
+    }
+
+    function triggerDamageEffect() {
+      var overlay = document.getElementById('damage-overlay');
+      if (overlay) {
+        if (damageHoldTimer) clearTimeout(damageHoldTimer);
+        overlay.classList.add('active');
+        damageHoldTimer = setTimeout(function () {
+          overlay.classList.remove('active');
+        }, 140);
+      }
+      applyScreenShake('miss');
+    }
+
+    window.applyScreenShake = applyScreenShake;
+    window.triggerImpactShake = triggerImpactShake;
+    window.triggerDamageEffect = triggerDamageEffect;
+
+    // Game Configuration Options
+    const option = {
+      width: gameWidth,
+      height: gameHeight,
+      canvasId: 'canvas',
+      soundOn: soundEnabled,
+      highScore: highScore,
+      setGameScore: function (s, isPerfect, streak) {
+        score = s;
+        if (isPerfect && streak >= 3) {
+          if (crazySDK && crazySDK.game && crazySDK.game.happytime) {
+            crazySDK.game.happytime();
+          }
+        }
+      },
+      setGameSuccess: function (s) {
+        successCount = s;
+        if (crazySDK && crazySDK.game) {
+          if (s === 10 || s === 25 || s === 50) {
+            if (crazySDK.game.happytime) {
+              crazySDK.game.happytime();
+            }
+          }
+          if (crazySDK.game.reportGameCompletedPercentage) {
+            if (s === 10) crazySDK.game.reportGameCompletedPercentage(25);
+            else if (s === 25) crazySDK.game.reportGameCompletedPercentage(50);
+            else if (s === 50) crazySDK.game.reportGameCompletedPercentage(100);
+          }
+        }
+      },
+      setGameFailed: function (f) {
+        triggerDamageEffect();
+        if (f >= 3) {
+          overShowOver();
+        }
+      },
+      onShake: function (isPerfect) {
+        triggerImpactShake(isPerfect);
+      },
+      onMiss: function (failedCount) {
+        triggerDamageEffect();
+      },
+      onTumble: function () {
+        triggerDamageEffect();
+      }
+    };
+
+    function gameReady() {
+      try {
+        if (typeof TowerGame !== 'function') {
+          console.warn('TowerGame not defined yet, retrying...');
+          setTimeout(function () {
+            if (typeof TowerGame === 'function') {
+              gameReady();
+            } else {
+              hideLoading();
+            }
+          }, 150);
+          return;
+        }
+        game = TowerGame(option);
+        applyAudioState();
+        game.load(function () {
+          try {
+            game.init();
+          } catch (e) {
+            console.warn('game.init error:', e);
+          }
+          canvasReady = true;
+          hideLoading();
+          if (soundEnabled && !isPlatformMuted) {
+            try { game.playBgm(); } catch (e) {}
+          }
+        }, updateLoading);
+      } catch (err) {
+        console.error('gameReady exception:', err);
+        hideLoading();
+      }
+    }
+
+    function indexHide() {
+      $('.landing .action-1').addClass('slideTop');
+      $('.landing .action-2').addClass('slideBottom');
+      setTimeout(function () {
+        $('.landing').addClass('hide').hide();
+      }, 850);
+    }
+
+    function startGameplay() {
+      if (gameStart) return;
+      gameStart = true;
+      if (crazySDK && crazySDK.game && crazySDK.game.gameplayStart) {
+        crazySDK.game.gameplayStart();
+      }
+      applyAudioState();
+      indexHide();
+      setTimeout(function () {
+        $('#game-hud').removeClass('hide').show();
+        game.start();
+        if (soundEnabled && !isPlatformMuted) {
+          game.playBgm();
+        }
+      }, 400);
+    }
+
+    // Pause / Resume Logic
+    function pauseGame() {
+      if (!gameStart || !game || game.paused) return;
+      if (game.pause) {
+        game.pause();
+      } else {
+        game.paused = true;
+      }
+      if (crazySDK && crazySDK.game && crazySDK.game.gameplayStop) {
+        crazySDK.game.gameplayStop();
+      }
+      $('#pause-modal').removeClass('hide').show();
+      $('#game-hud').addClass('hide').hide();
+    }
+
+    function resumeGame() {
+      if (!game) return;
+      $('#pause-modal').addClass('hide').hide();
+      $('#game-hud').removeClass('hide').show();
+      if (game.resume) {
+        game.resume();
+      } else {
+        game.paused = false;
+      }
+      if (crazySDK && crazySDK.game && crazySDK.game.gameplayStart) {
+        crazySDK.game.gameplayStart();
+      }
+      applyAudioState();
+    }
+
+    function exitToMainMenu() {
+      if (!game) return;
+      $('#pause-modal').addClass('hide').hide();
+      $('#modal').addClass('hide').hide();
+      $('#over-modal').addClass('hide').hide();
+      $('#over-zero').addClass('hide').hide();
+      $('#game-hud').addClass('hide').hide();
+
+      game.reset();
+      gameStart = false;
+      score = 0;
+      successCount = 0;
+
+      if (crazySDK && crazySDK.game && crazySDK.game.gameplayStop) {
+        crazySDK.game.gameplayStop();
+      }
+
+      if (soundEnabled && !isPlatformMuted) {
+        game.playBgm();
+      } else {
+        game.pauseBgm();
+      }
+
+      $('#canvas').removeClass('hide').show();
+      $('.landing').removeClass('hide').show();
+      $('.landing .action-1').removeClass('slideTop');
+      $('.landing .action-2').removeClass('slideBottom');
+      $('#high-score-val').text(highScore);
+    }
+
+    function restartGame() {
+      if (!game) return;
+      $('#pause-modal').addClass('hide').hide();
+      $('#modal').addClass('hide').hide();
+      $('#over-modal').addClass('hide').hide();
+      $('#over-zero').addClass('hide').hide();
+
+      game.reset();
+      gameStart = true;
+      score = 0;
+      successCount = 0;
+
+      if (crazySDK && crazySDK.game && crazySDK.game.gameplayStart) {
+        crazySDK.game.gameplayStart();
+      }
+
+      $('#canvas').removeClass('hide').show();
+      $('#game-hud').removeClass('hide').show();
+      applyAudioState();
+      game.start();
+      if (soundEnabled && !isPlatformMuted) {
+        game.playBgm();
+      }
+    }
+
+    // DOM Event Listeners (with stopPropagation to prevent accidental block drops)
+    $('#game-hud, .hud-btn, .modal, .landing').on('mousedown pointerdown touchstart', function (e) {
+      e.stopPropagation();
+    });
+
+    $('#start').on('click touchstart', function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      playTapSound();
+      startGameplay();
+    });
+
+    $('#btn-pause').on('click touchstart', function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      playTapSound();
+      pauseGame();
+    });
+
+    $('#btn-sound').on('click touchstart', function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      var willEnable = !soundEnabled;
+      if (!willEnable) {
+        playTapSound();
+      }
+      saveSoundPreference(willEnable);
+      if (willEnable) {
+        playTapSound();
+      }
+    });
+
+    $('#btn-home').on('click touchstart', function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+      playTapSound();
+      exitToMainMenu();
+    });
+
+    $('#btn-resume').on('click', function (e) {
+      e.stopPropagation();
+      playTapSound();
+      resumeGame();
+    });
+
+    $('#btn-pause-sound').on('click', function (e) {
+      e.stopPropagation();
+      var willEnable = !soundEnabled;
+      if (!willEnable) {
+        playTapSound();
+      }
+      saveSoundPreference(willEnable);
+      if (willEnable) {
+        playTapSound();
+      }
+    });
+
+    $('#btn-pause-restart').on('click', function (e) {
+      e.stopPropagation();
+      playTapSound();
+      restartGame();
+    });
+
+    $('#btn-pause-home').on('click', function (e) {
+      e.stopPropagation();
+      playTapSound();
+      exitToMainMenu();
+    });
+
+    // Game Over Buttons
+    $('.js-reload').on('click', function (e) {
+      e.stopPropagation();
+      playTapSound();
+      restartGame();
+    });
+
+    $('#btn-over-home').on('click', function (e) {
+      e.stopPropagation();
+      playTapSound();
+      exitToMainMenu();
+    });
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', function (e) {
+      if (e.code === 'KeyP' || e.code === 'Escape') {
+        e.preventDefault();
+        if (game && game.paused) {
+          resumeGame();
+        } else if (gameStart) {
+          pauseGame();
+        }
+      } else if (e.code === 'KeyM') {
+        e.preventDefault();
+        saveSoundPreference(!soundEnabled);
+      }
+    });
+
+    // First user gesture audio unlocker
+    var audioUnlocked = false;
+    function unlockAudio() {
+      if (audioUnlocked) return;
+      audioUnlocked = true;
+      initTapSound();
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume().catch(function () {});
+      }
+      if (game && game.assetsObj && game.assetsObj.audio) {
+        var bgm = game.assetsObj.audio['bgm'];
+        if (bgm && bgm.load) {
+          try { bgm.load(); } catch (e) {}
+        }
+      }
+      if (soundEnabled && !isPlatformMuted && game && !game.paused) {
+        game.playBgm();
+      }
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+    }
+    window.addEventListener('click', unlockAudio, { passive: true });
+    window.addEventListener('touchstart', unlockAudio, { passive: true });
+    window.addEventListener('keydown', unlockAudio, { passive: true });
+
+    // Tab visibility handling (auto-pause on background tab)
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        if (gameStart && game && !game.paused) {
+          pauseGame();
+        } else if (game) {
+          game.pauseBgm();
+        }
+      } else {
+        if (game && !game.paused && soundEnabled && !isPlatformMuted) {
+          game.playBgm();
+        }
+      }
+    });
+
+    // App Initialization
+    function initApp() {
+      if (domReady) return;
+      domReady = true;
+      try {
+        loadSavedData();
+      } catch (e) {
+        console.warn('loadSavedData exception:', e);
+      }
+      try {
+        gameReady();
+      } catch (e) {
+        console.warn('gameReady exception:', e);
+        hideLoading();
+      }
+    }
+
+    // Initialize CrazyGames SDK v3 immediately and hook into lifecycle events
+    initCrazySDK();
+
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+      initApp();
+    } else {
+      window.addEventListener('DOMContentLoaded', function () {
+        initCrazySDK();
+        initApp();
+      }, false);
+      window.addEventListener('load', function () {
+        initCrazySDK();
+        initApp();
+      }, false);
+    }
+  </script>
+</body>
+</html>

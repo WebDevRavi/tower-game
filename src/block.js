@@ -90,12 +90,13 @@ export const blockAction = (instance, engine, time) => {
       i.x = instance.weightX - instance.calWidth
       i.y = instance.weightY + (0.3 * instance.height) // add rope height
       i.rotate = 0
+      i.vy = 0
       i.ay = engine.pixelsPerFrame(0.0003 * engine.height) // acceleration of gravity
       i.startDropTime = time
       i.status = constant.drop
       break
     case constant.drop:
-      const deltaTime = time - i.startDropTime
+      const deltaTime = Math.min(time - i.startDropTime, 35)
       i.startDropTime = time
       i.vy += i.ay * deltaTime
       i.y += (i.vy * deltaTime) + (0.5 * i.ay * (deltaTime ** 2))
@@ -109,6 +110,13 @@ export const blockAction = (instance, engine, time) => {
       }
       switch (collision) {
         case 1:
+          if (!instance.missTriggered) {
+            instance.missTriggered = true
+            if (engine.triggerMiss) {
+              engine.triggerMiss()
+            }
+            engine.playAudio('rotate')
+          }
           checkBlockOut(instance, engine)
           break
         case 2:
@@ -116,16 +124,29 @@ export const blockAction = (instance, engine, time) => {
           instance.y = blockY
           instance.outwardOffset = (line.x + instance.calWidth) - instance.x
           calRotate(instance)
+          if (engine.triggerTumble) {
+            engine.triggerTumble()
+          }
+          if (engine.triggerMiss) {
+            engine.triggerMiss()
+          }
           break
         case 3:
           i.status = constant.rotateRight
           instance.y = blockY
           instance.outwardOffset = (line.collisionX + instance.calWidth) - instance.x
           calRotate(instance)
+          if (engine.triggerTumble) {
+            engine.triggerTumble()
+          }
+          if (engine.triggerMiss) {
+            engine.triggerMiss()
+          }
           break
         case 4:
         case 5:
           i.status = constant.land
+          i.landTime = engine.utils.getCurrentTime()
           const lastSuccessCount = engine.getVariable(constant.successCount)
           addSuccessCount(engine)
           engine.setTimeMovement(constant.moveDownMovement, 500)
@@ -146,9 +167,15 @@ export const blockAction = (instance, engine, time) => {
             instance.perfect = true
             addScore(engine, true)
             engine.playAudio('drop-perfect')
+            if (engine.triggerShake) {
+              engine.triggerShake(true)
+            }
           } else {
             addScore(engine)
             engine.playAudio('drop')
+            if (engine.triggerShake) {
+              engine.triggerShake(false)
+            }
           }
           break
         default:
@@ -210,14 +237,29 @@ const drawSwingBlock = (instance, engine) => {
     , instance.weightY
     , instance.width, instance.height * 1.3
   )
-  const leftX = instance.weightX - instance.calWidth
-  engine.debugLineY(leftX)
 }
 
 const drawBlock = (instance, engine) => {
-  const { perfect } = instance
+  const { perfect, landTime } = instance
   const bl = engine.getImg(perfect ? 'block-perfect' : 'block')
-  engine.ctx.drawImage(bl, instance.x, instance.y, instance.width, instance.height)
+  if (!landTime) {
+    engine.ctx.drawImage(bl, instance.x, instance.y, instance.width, instance.height)
+    return
+  }
+  const elapsed = engine.utils.getCurrentTime() - landTime
+  if (elapsed < 200) {
+    const p = elapsed / 200
+    const squash = Math.sin(p * Math.PI) * 0.05 * (1 - p)
+    const scaleY = 1 - squash
+    const scaleX = 1 + (squash * 0.6)
+    const drawW = instance.width * scaleX
+    const drawH = instance.height * scaleY
+    const drawX = instance.x - ((drawW - instance.width) / 2)
+    const drawY = (instance.y + instance.height) - drawH
+    engine.ctx.drawImage(bl, drawX, drawY, drawW, drawH)
+  } else {
+    engine.ctx.drawImage(bl, instance.x, instance.y, instance.width, instance.height)
+  }
 }
 
 const drawRotatedBlock = (instance, engine) => {

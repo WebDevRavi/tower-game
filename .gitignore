@@ -1,6 +1,30 @@
-node_modules
-.idea/
-npm-debug.log
-yarn.lock
-.DS_Store
+# Dependencies
+node_modules/
+package-lock.json.bak
 
+# Builds & Zip Archives
+*.zip
+blue3d-tower-game/
+
+# Screenshots & Raw Media
+Screenshot*.png
+*.tmp
+
+# Internal Reports & Chat Records
+AUDIT_REPORT.md
+FINAL_CRAZYGAMES_AUDIT.md
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / Editor Files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
